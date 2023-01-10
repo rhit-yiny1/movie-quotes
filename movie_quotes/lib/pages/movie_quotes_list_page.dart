@@ -11,6 +11,8 @@ class MovieQuoteListPage extends StatefulWidget {
 }
 
 class _MovieQuoteListPage extends State<MovieQuoteListPage> {
+  final movieTextController = TextEditingController();
+  final quoteTextController = TextEditingController();
   final quotes =
       <MovieQuote>[]; // later we will remove this and use the firestore
 
@@ -32,30 +34,103 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
 
   @override
   void dispose() {
-    super.dispose();
+    quoteTextController.dispose();
+    movieTextController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final List<MovieQuoteRow> movieRows = [];
+    for (MovieQuote mq in quotes) {
+      movieRows.add(MovieQuoteRow(mq: mq));
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Movie Quotes"),
       ),
       backgroundColor: Colors.grey[100],
       body: ListView(
-        children: [
-          MovieQuoteRow(mq: quotes[0]),
-          MovieQuoteRow(mq: quotes[1]),
-          MovieQuoteRow(mq: quotes[2]),
-        ],
+        // children: [
+        //   MovieQuoteRow(mq: quotes[0]),
+        //   MovieQuoteRow(mq: quotes[1]),
+        //   MovieQuoteRow(mq: quotes[2]),
+        // ],
+        children: movieRows,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          print("You pressed the fab!");
+          showCreateQuoteDialog(context);
         },
         tooltip: 'Create',
         child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  Future<void> showCreateQuoteDialog(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Create a Movie Quote'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                child: TextFormField(
+                  controller: quoteTextController,
+                  decoration: const InputDecoration(
+                    border: UnderlineInputBorder(),
+                    labelText: 'Enter the quote',
+                  ),
+                ),
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                child: TextFormField(
+                  controller: movieTextController,
+                  decoration: const InputDecoration(
+                    border: UnderlineInputBorder(),
+                    labelText: 'Enter the movie',
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Create'),
+              onPressed: () {
+                setState(() {
+                  quotes.add(MovieQuote(
+                      quote: quoteTextController.text,
+                      movie: movieTextController.text));
+                  quoteTextController.text = "";
+                  movieTextController.text = "";
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
