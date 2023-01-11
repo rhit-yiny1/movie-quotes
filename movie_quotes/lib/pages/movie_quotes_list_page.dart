@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movie_quotes/components/movie_quote_row_component.dart';
+import 'package:movie_quotes/pages/movie_quote_detail_page.dart';
 
 import '../models/movie_quote.dart';
 
@@ -42,7 +43,21 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
   Widget build(BuildContext context) {
     final List<MovieQuoteRow> movieRows = [];
     for (MovieQuote mq in quotes) {
-      movieRows.add(MovieQuoteRow(mq: mq));
+      movieRows.add(MovieQuoteRow(
+        movieQuote: mq,
+        onTap: () {
+          print("You clicked on the movie quote ${mq.quote} - ${mq.movie}");
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) {
+                return MovieQuoteDetailPage();
+              },
+            ),
+          );
+        },
+      ));
     }
 
     return Scaffold(
