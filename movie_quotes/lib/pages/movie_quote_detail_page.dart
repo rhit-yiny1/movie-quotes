@@ -10,6 +10,15 @@ class MovieQuoteDetailPage extends StatefulWidget {
 }
 
 class _MovieQuoteDetailPageState extends State<MovieQuoteDetailPage> {
+  final movieTextController = TextEditingController();
+  final quoteTextController = TextEditingController();
+
+  // @override
+  // void dispose() {
+  //   quoteTextController.dispose();
+  //   movieTextController.dispose();
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,12 +28,21 @@ class _MovieQuoteDetailPageState extends State<MovieQuoteDetailPage> {
           IconButton(
             onPressed: () {
               print("You clicked Edit");
+              showCreateQuoteDialog(context);
             },
             icon: Icon(Icons.edit),
           ),
           IconButton(
             onPressed: () {
               print("You clicked Delete");
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: const Text('Quote Deleted'),
+                  action: SnackBarAction(
+                    label: 'Undo',
+                    onPressed: () {
+                      print("TODO: Figure out undo");
+                    },
+                  )));
               Navigator.pop(context);
             },
             icon: Icon(Icons.delete),
@@ -49,6 +67,77 @@ class _MovieQuoteDetailPageState extends State<MovieQuoteDetailPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> showCreateQuoteDialog(BuildContext context) {
+    quoteTextController.text = widget.mq.quote;
+    movieTextController.text = widget.mq.movie;
+
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit a Movie Quote'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                child: TextFormField(
+                  controller: quoteTextController,
+                  decoration: const InputDecoration(
+                    border: UnderlineInputBorder(),
+                    labelText: 'Enter the quote',
+                  ),
+                ),
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                child: TextFormField(
+                  controller: movieTextController,
+                  decoration: const InputDecoration(
+                    border: UnderlineInputBorder(),
+                    labelText: 'Enter the movie',
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Update'),
+              onPressed: () {
+                setState(() {
+                  // quotes.add(MovieQuote(
+                  //     quote: quoteTextController.text,
+                  //     movie: movieTextController.text));
+                  // quoteTextController.text = widget.mq.quote;
+                  // movieTextController.text = widget.mq.movie;
+                  widget.mq.quote = quoteTextController.text;
+                  widget.mq.movie = movieTextController.text;
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
