@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "38445886992",
+    "project_id": "yiny1-movie-quotes",
+    "storage_bucket": "yiny1-movie-quotes.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:38445886992:android:0366a2e1053a5a69612495",
+        "android_client_info": {
+          "package_name": "edu.rose_hulman.yiny1.movie_quotes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "38445886992-vr30fpqm6pis9le4pnk4peadau7krcr8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaFvtjCgYZQ6RRFQ62yr7PAhLQ_fxtJoA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "38445886992-vr30fpqm6pis9le4pnk4peadau7krcr8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "38445886992-8pbmdt7rp18sdov2hii0uf58p9g074fh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.movieQuotes"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
