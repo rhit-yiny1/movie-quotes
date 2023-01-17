@@ -29,6 +29,7 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
     movieQuotesSubscription =
         MovieQuotesCollectionManager.instance.startListening(() {
       print("There are new quotes!!!!");
+      setState(() {});
     });
     // quotes.add(
     //   MovieQuote(quote: "I'll be back", movie: "The Terminator"),
