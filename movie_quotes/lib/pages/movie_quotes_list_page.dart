@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:movie_quotes/components/movie_quote_row_component.dart';
+import 'package:movie_quotes/managers/movie_quote_collection_manager.dart';
 import 'package:movie_quotes/pages/movie_quote_detail_page.dart';
 
 import '../models/movie_quote.dart';
@@ -17,20 +20,27 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
   final quotes =
       <MovieQuote>[]; // later we will remove this and use the firestore
 
+  StreamSubscription? movieQuotesSubscription;
+
   @override
   void initState() {
     super.initState();
-    quotes.add(
-      MovieQuote(quote: "I'll be back", movie: "The Terminator"),
-    );
 
-    quotes.add(
-      MovieQuote(quote: "ok", movie: "movie"),
-    );
+    movieQuotesSubscription =
+        MovieQuotesCollectionManager.instance.startListening(() {
+      print("There are new quotes!!!!");
+    });
+    // quotes.add(
+    //   MovieQuote(quote: "I'll be back", movie: "The Terminator"),
+    // );
 
-    quotes.add(
-      MovieQuote(quote: "third", movie: "movie"),
-    );
+    // quotes.add(
+    //   MovieQuote(quote: "ok", movie: "movie"),
+    // );
+
+    // quotes.add(
+    //   MovieQuote(quote: "third", movie: "movie"),
+    // );
   }
 
   @override
@@ -136,9 +146,9 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
               child: const Text('Create'),
               onPressed: () {
                 setState(() {
-                  quotes.add(MovieQuote(
-                      quote: quoteTextController.text,
-                      movie: movieTextController.text));
+                  // quotes.add(MovieQuote(
+                  //     quote: quoteTextController.text,
+                  //     movie: movieTextController.text));
                   quoteTextController.text = "";
                   movieTextController.text = "";
                 });
