@@ -20,8 +20,29 @@ class MovieQuotesCollectionManager {
         .snapshots()
         .listen((QuerySnapshot) {
       print(QuerySnapshot.docs);
+      latestMovieQuotes =
+          QuerySnapshot.docs.map((doc) => MovieQuote.from(doc)).toList();
+      observer();
+      print(latestMovieQuotes);
     });
   }
 
-  // TODO: Make a stop listening
+  void stopListening(StreamSubscription? subscription) {
+    subscription?.cancel();
+  }
+
+  Future<void> add({
+    required String quote,
+    required String movie,
+  }) {
+    return _ref
+        .add({
+          kMovieQuote_quote: quote, // John Doe
+          kMovieQuote_movie: movie, // Stokes and Sons
+          kMovieQuote_lastTouched: Timestamp.now(), // 42
+        })
+        .then((DocumentReference docRef) =>
+            print("Movie Quote added with id ${docRef.id}"))
+        .catchError((error) => print("Failed to add Movie Quote: $error"));
+  }
 }

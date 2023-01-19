@@ -48,30 +48,52 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
   void dispose() {
     quoteTextController.dispose();
     movieTextController.dispose();
+    MovieQuotesCollectionManager.instance
+        .stopListening(movieQuotesSubscription);
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<MovieQuoteRow> movieRows = [];
-    for (MovieQuote mq in quotes) {
-      movieRows.add(MovieQuoteRow(
-        movieQuote: mq,
-        onTap: () async {
-          print("You clicked on the movie quote ${mq.quote} - ${mq.movie}");
+    final List<MovieQuoteRow> movieRows =
+        MovieQuotesCollectionManager.instance.latestMovieQuotes
+            .map((mq) => MovieQuoteRow(
+                  movieQuote: mq,
+                  onTap: () async {
+                    print(
+                        "You clicked on the movie quote ${mq.quote} - ${mq.movie}");
 
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (BuildContext context) {
-                return MovieQuoteDetailPage(
-                    mq); // In firebase, use a document ID
-              },
-            ),
-          );
-          setState(() {});
-        },
-      ));
-    }
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) {
+                          return MovieQuoteDetailPage(
+                              mq); // In firebase, use a document ID
+                        },
+                      ),
+                    );
+                    setState(() {});
+                  },
+                ))
+            .toList();
+    // for (MovieQuote mq in quotes) {
+    //   movieRows.add(MovieQuoteRow(
+    //     movieQuote: mq,
+    //     onTap: () async {
+    //       print("You clicked on the movie quote ${mq.quote} - ${mq.movie}");
+
+    //       await Navigator.push(
+    //         context,
+    //         MaterialPageRoute(
+    //           builder: (BuildContext context) {
+    //             return MovieQuoteDetailPage(
+    //                 mq); // In firebase, use a document ID
+    //           },
+    //         ),
+    //       );
+    //       setState(() {});
+    //     },
+    //   ));
+    // }
 
     return Scaffold(
       appBar: AppBar(
@@ -147,6 +169,10 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
               child: const Text('Create'),
               onPressed: () {
                 setState(() {
+                  MovieQuotesCollectionManager.instance.add(
+                    quote: quoteTextController.text,
+                    movie: movieTextController.text,
+                  );
                   // quotes.add(MovieQuote(
                   //     quote: quoteTextController.text,
                   //     movie: movieTextController.text));
