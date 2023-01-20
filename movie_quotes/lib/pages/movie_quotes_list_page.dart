@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:movie_quotes/components/movie_quote_row_component.dart';
-import 'package:movie_quotes/managers/movie_quote_collection_manager.dart';
+import 'package:movie_quotes/managers/movie_quotes_collection_manager.dart';
 import 'package:movie_quotes/pages/movie_quote_detail_page.dart';
 
 import '../models/movie_quote.dart';
@@ -27,35 +27,23 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
     super.initState();
 
     movieQuotesSubscription =
-        MovieQuotesCollectionManager.instance.startListening(() {
-      print("There are new quotes!!!!");
+        MovieQuoteCollectionManager.instance.startListening(() {
       setState(() {});
     });
-    // quotes.add(
-    //   MovieQuote(quote: "I'll be back", movie: "The Terminator"),
-    // );
-
-    // quotes.add(
-    //   MovieQuote(quote: "ok", movie: "movie"),
-    // );
-
-    // quotes.add(
-    //   MovieQuote(quote: "third", movie: "movie"),
-    // );
   }
 
   @override
   void dispose() {
     quoteTextController.dispose();
     movieTextController.dispose();
-    MovieQuotesCollectionManager.instance
-        .stopListening(movieQuotesSubscription);
+    MovieQuoteCollectionManager.instance.stopListening(movieQuotesSubscription);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final List<MovieQuoteRow> movieRows =
-        MovieQuotesCollectionManager.instance.latestMovieQuotes
+        MovieQuoteCollectionManager.instance.latestMovieQuotes
             .map((mq) => MovieQuoteRow(
                   movieQuote: mq,
                   onTap: () async {
@@ -67,7 +55,7 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
                       MaterialPageRoute(
                         builder: (BuildContext context) {
                           return MovieQuoteDetailPage(
-                              mq); // In firebase, use a document ID
+                              mq.documentId!); // In firebase, use a document ID
                         },
                       ),
                     );
@@ -169,7 +157,7 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
               child: const Text('Create'),
               onPressed: () {
                 setState(() {
-                  MovieQuotesCollectionManager.instance.add(
+                  MovieQuoteCollectionManager.instance.add(
                     quote: quoteTextController.text,
                     movie: movieTextController.text,
                   );
