@@ -20,10 +20,13 @@ class _EmailPasswordAuthPageState extends State<EmailPasswordAuthPage> {
   final passwordTextController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
+  UniqueKey? _loginObserverKey;
+
   @override
   void initState() {
-    // TODO: Remove this quick hack!
-    AuthManager.instance.startListening();
+    _loginObserverKey = AuthManager.instance.addLoginObserver(() {
+      print("pop this page");
+    });
     super.initState();
   }
 
@@ -31,6 +34,7 @@ class _EmailPasswordAuthPageState extends State<EmailPasswordAuthPage> {
   void dispose() {
     emailTextController.dispose();
     passwordTextController.dispose();
+    AuthManager.instance.removeObserver(_loginObserverKey);
     super.dispose();
   }
 

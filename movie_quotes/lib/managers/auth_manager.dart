@@ -50,18 +50,20 @@ class AuthManager {
   }
 
   UniqueKey addLoginObserver(Function observer) {
+    startListening(); // Lazy load, does nothing in future calls.
     UniqueKey key = UniqueKey();
     _loginObservers[key] = observer;
     return key;
   }
 
   UniqueKey addLogoutObserver(Function observer) {
+    startListening(); // Lazy load, does nothing in future calls.
     UniqueKey key = UniqueKey();
     _logoutObservers[key] = observer;
     return key;
   }
 
-  void removeObserver(UniqueKey key) {
+  void removeObserver(UniqueKey? key) {
     _loginObservers.remove(key);
     _logoutObservers.remove(key);
   }
