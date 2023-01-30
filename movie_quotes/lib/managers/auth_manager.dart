@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:html';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -68,9 +69,16 @@ class AuthManager {
     _logoutObservers.remove(key);
   }
 
+  void signOut() {
+    FirebaseAuth.instance.signOut();
+  }
+
   String get email => _user?.email ?? "";
   String get uid => _user?.uid ?? "";
-  bool get isSignedIn => _user != null;
+  //bool get isSignedIn => _user != null;
+
+  //bool get isSignedIn => true;
+  bool get isSignedIn => false;
 
   // --- Specific auth methods...
 
@@ -113,7 +121,26 @@ class AuthManager {
   }
 
   void logInExistingUserEmailPassword({
+    required BuildContext context,
     required String email,
     required String password,
-  }) {}
+  }) async {
+    try {
+      final Credential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+      print("User logged in with $email, $password");
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        _showAuthSnackbar(
+            context: context,
+            authErrorMessage: "No user found for that email.");
+      } else if (e.code == "wrong-password") {
+        _showAuthSnackbar(
+            context: context,
+            authErrorMessage: "wrong password previded for that user.");
+      }
+    } catch (e) {
+      _showAuthSnackbar(context: context, authErrorMessage: e.toString());
+    }
+  }
 }

@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:movie_quotes/components/movie_quote_row_component.dart';
+import 'package:movie_quotes/managers/auth_manager.dart';
 import 'package:movie_quotes/managers/movie_quotes_collection_manager.dart';
 import 'package:movie_quotes/pages/movie_quote_detail_page.dart';
 
 import '../models/movie_quote.dart';
+import 'login_front_page.dart';
 
 class MovieQuoteListPage extends StatefulWidget {
   const MovieQuoteListPage({super.key});
@@ -21,6 +23,8 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
       <MovieQuote>[]; // later we will remove this and use the firestore
 
   StreamSubscription? movieQuotesSubscription;
+  UniqueKey? _loginObserverKey;
+  UniqueKey? _logoutObserverKey;
 
   @override
   void initState() {
@@ -30,6 +34,14 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
         MovieQuoteCollectionManager.instance.startListening(() {
       setState(() {});
     });
+
+    _loginObserverKey = AuthManager.instance.addLoginObserver(() {
+      print(() {});
+    });
+
+    _logoutObserverKey = AuthManager.instance.addLogoutObserver(() {
+      print(() {});
+    });
   }
 
   @override
@@ -37,6 +49,8 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
     quoteTextController.dispose();
     movieTextController.dispose();
     MovieQuoteCollectionManager.instance.stopListening(movieQuotesSubscription);
+    AuthManager.instance.removeObserver(_loginObserverKey);
+    AuthManager.instance.removeObserver(_logoutObserverKey);
     super.dispose();
   }
 
@@ -63,42 +77,43 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
                   },
                 ))
             .toList();
-    // for (MovieQuote mq in quotes) {
-    //   movieRows.add(MovieQuoteRow(
-    //     movieQuote: mq,
-    //     onTap: () async {
-    //       print("You clicked on the movie quote ${mq.quote} - ${mq.movie}");
-
-    //       await Navigator.push(
-    //         context,
-    //         MaterialPageRoute(
-    //           builder: (BuildContext context) {
-    //             return MovieQuoteDetailPage(
-    //                 mq); // In firebase, use a document ID
-    //           },
-    //         ),
-    //       );
-    //       setState(() {});
-    //     },
-    //   ));
-    // }
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Movie Quotes"),
+        actions: AuthManager.instance.isSignedIn
+            ? [
+                IconButton(
+                    onPressed: () {
+                      AuthManager.instance.signOut();
+                    },
+                    tooltip: "Log out",
+                    icon: const Icon(Icons.logout)),
+              ]
+            : [
+                IconButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (BuildContext context) {
+                      return const LoginFrontPage();
+                    }));
+                  },
+                  tooltip: "Log in",
+                  icon: Icon(Icons.login),
+                ),
+              ],
       ),
       backgroundColor: Colors.grey[100],
       body: ListView(
-        // children: [
-        //   MovieQuoteRow(mq: quotes[0]),
-        //   MovieQuoteRow(mq: quotes[1]),
-        //   MovieQuoteRow(mq: quotes[2]),
-        // ],
         children: movieRows,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showCreateQuoteDialog(context);
+          if (AuthManager.instance.isSignedIn) {
+            showCreateQuoteDialog(context);
+          } else {
+            showMustLogInDialog(context);
+          }
         },
         tooltip: 'Create',
         child: const Icon(Icons.add),
@@ -168,6 +183,43 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
                   movieTextController.text = "";
                 });
                 Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> showMustLogInDialog(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Login Required'),
+          content: const Text(
+              "You must be signed in to post, would you like to sign in now?"),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Go sign in'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (BuildContext context) {
+                  return const LoginFrontPage();
+                }));
               },
             ),
           ],

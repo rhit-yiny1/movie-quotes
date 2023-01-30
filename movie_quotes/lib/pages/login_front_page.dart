@@ -35,7 +35,6 @@ class _LoginFrontPageState extends State<LoginFrontPage> {
             LoginButton(
               title: "Log in",
               callback: () {
-                print("TODO: Go to the next page to log in");
                 Navigator.push(
                   context,
                   MaterialPageRoute(

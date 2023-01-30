@@ -111,7 +111,12 @@ class _EmailPasswordAuthPageState extends State<EmailPasswordAuthPage> {
                           password: passwordTextController.text,
                         );
                       } else {
-                        print("TODO: Log in an existing user");
+                        print("Logging in an existing user");
+                        AuthManager.instance.logInExistingUserEmailPassword(
+                          context: context,
+                          email: emailTextController.text,
+                          password: passwordTextController.text,
+                        );
                       }
                     } else {
                       print("This form isn't valid, do nothing");
