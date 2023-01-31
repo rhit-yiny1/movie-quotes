@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:movie_quotes/managers/auth_manager.dart';
 
 import '../models/movie_quote.dart';
 
@@ -37,6 +38,7 @@ class MovieQuoteCollectionManager {
   }) {
     return _ref
         .add({
+          kMovieQuote_authorUid: AuthManager.instance.uid,
           kMovieQuote_quote: quote, // John Doe
           kMovieQuote_movie: movie, // Stokes and Sons
           kMovieQuote_lastTouched: Timestamp.now(), // 42

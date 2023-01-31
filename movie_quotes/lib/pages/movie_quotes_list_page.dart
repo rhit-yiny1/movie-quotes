@@ -5,25 +5,25 @@ import 'package:movie_quotes/components/list_page_side_drawer.dart';
 import 'package:movie_quotes/components/movie_quote_row_component.dart';
 import 'package:movie_quotes/managers/auth_manager.dart';
 import 'package:movie_quotes/managers/movie_quotes_collection_manager.dart';
+import 'package:movie_quotes/models/movie_quote.dart';
 import 'package:movie_quotes/pages/movie_quote_detail_page.dart';
 
-import '../models/movie_quote.dart';
 import 'login_front_page.dart';
 
-class MovieQuoteListPage extends StatefulWidget {
-  const MovieQuoteListPage({super.key});
+class MovieQuotesListPage extends StatefulWidget {
+  const MovieQuotesListPage({super.key});
 
   @override
-  State<MovieQuoteListPage> createState() => _MovieQuoteListPage();
+  State<MovieQuotesListPage> createState() => _MovieQuotesListPageState();
 }
 
-class _MovieQuoteListPage extends State<MovieQuoteListPage> {
-  final movieTextController = TextEditingController();
+class _MovieQuotesListPageState extends State<MovieQuotesListPage> {
+  final quotes = <MovieQuote>[]; // Later we will remove this and use Firestore
   final quoteTextController = TextEditingController();
-  final quotes =
-      <MovieQuote>[]; // later we will remove this and use the firestore
+  final movieTextController = TextEditingController();
 
   StreamSubscription? movieQuotesSubscription;
+
   UniqueKey? _loginObserverKey;
   UniqueKey? _logoutObserverKey;
 
@@ -37,11 +37,11 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
     });
 
     _loginObserverKey = AuthManager.instance.addLoginObserver(() {
-      print(() {});
+      setState(() {});
     });
 
     _logoutObserverKey = AuthManager.instance.addLogoutObserver(() {
-      print(() {});
+      setState(() {});
     });
   }
 
@@ -64,13 +64,12 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
                   onTap: () async {
                     print(
                         "You clicked on the movie quote ${mq.quote} - ${mq.movie}");
-
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (BuildContext context) {
                           return MovieQuoteDetailPage(
-                              mq.documentId!); // In firebase, use a document ID
+                              mq.documentId!); // In Firebase use a documentId
                         },
                       ),
                     );
@@ -87,13 +86,14 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
             : [
                 IconButton(
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (BuildContext context) {
-                      return const LoginFrontPage();
-                    }));
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (BuildContext context) {
+                        return const LoginFrontPage();
+                      },
+                    ));
                   },
                   tooltip: "Log in",
-                  icon: Icon(Icons.login),
+                  icon: const Icon(Icons.login),
                 ),
               ],
       ),
@@ -128,7 +128,7 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
             children: <Widget>[
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4.0),
                 child: TextFormField(
                   controller: quoteTextController,
                   decoration: const InputDecoration(
@@ -139,7 +139,7 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
               ),
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4.0),
                 child: TextFormField(
                   controller: movieTextController,
                   decoration: const InputDecoration(
@@ -171,9 +171,6 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
                     quote: quoteTextController.text,
                     movie: movieTextController.text,
                   );
-                  // quotes.add(MovieQuote(
-                  //     quote: quoteTextController.text,
-                  //     movie: movieTextController.text));
                   quoteTextController.text = "";
                   movieTextController.text = "";
                 });
@@ -191,9 +188,9 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Login Required'),
+          title: const Text("Login Required"),
           content: const Text(
-              "You must be signed in to post, would you like to sign in now?"),
+              "You must be signed in to post.  Would you like to sign in now?"),
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(
@@ -208,13 +205,14 @@ class _MovieQuoteListPage extends State<MovieQuoteListPage> {
               style: TextButton.styleFrom(
                 textStyle: Theme.of(context).textTheme.labelLarge,
               ),
-              child: const Text('Go sign in'),
+              child: const Text("Go sign in"),
               onPressed: () {
                 Navigator.of(context).pop();
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (BuildContext context) {
-                  return const LoginFrontPage();
-                }));
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (BuildContext context) {
+                    return const LoginFrontPage();
+                  },
+                ));
               },
             ),
           ],

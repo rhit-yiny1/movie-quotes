@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:html';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -75,10 +74,11 @@ class AuthManager {
 
   String get email => _user?.email ?? "";
   String get uid => _user?.uid ?? "";
-  //bool get isSignedIn => _user != null;
+  bool get isSignedIn => _user != null;
 
-  //bool get isSignedIn => true;
-  bool get isSignedIn => false;
+// Done for UI testing...
+  // bool get isSignedIn => true; // Signed in UI testing
+  // bool get isSignedIn => false;  // NOT signed in
 
   // --- Specific auth methods...
 
@@ -126,18 +126,20 @@ class AuthManager {
     required String password,
   }) async {
     try {
-      final Credential = await FirebaseAuth.instance
+      final credential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-      print("User logged in with $email, $password");
+      print("AuthManager: Logged in existing User ${credential.user?.email}");
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
+      if (e.code == "user-not-found") {
+        // print('No user found for that email.');
         _showAuthSnackbar(
             context: context,
             authErrorMessage: "No user found for that email.");
       } else if (e.code == "wrong-password") {
+        // print('Wrong password provided for that user.');
         _showAuthSnackbar(
             context: context,
-            authErrorMessage: "wrong password previded for that user.");
+            authErrorMessage: "Wrong password provided for that user.");
       }
     } catch (e) {
       _showAuthSnackbar(context: context, authErrorMessage: e.toString());
