@@ -1,3 +1,4 @@
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:movie_quotes/pages/login_front_page.dart';
 import 'package:movie_quotes/pages/movie_quotes_list_page.dart';
@@ -8,6 +9,11 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  FirebaseUIAuth.configureProviders([
+    EmailAuthProvider(),
+    // ... other providers
+  ]);
+
   runApp(const MyApp());
 }
 

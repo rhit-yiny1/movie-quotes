@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:movie_quotes/components/list_page_side_drawer.dart';
 import 'package:movie_quotes/components/movie_quote_row_component.dart';
@@ -22,7 +23,8 @@ class _MovieQuotesListPageState extends State<MovieQuotesListPage> {
   final quoteTextController = TextEditingController();
   final movieTextController = TextEditingController();
 
-  StreamSubscription? movieQuotesSubscription;
+  // StreamSubscription? movieQuotesSubscription;
+  bool _isShowingAllQuotes = true;
 
   UniqueKey? _loginObserverKey;
   UniqueKey? _logoutObserverKey;
@@ -31,10 +33,7 @@ class _MovieQuotesListPageState extends State<MovieQuotesListPage> {
   void initState() {
     super.initState();
 
-    movieQuotesSubscription =
-        MovieQuoteCollectionManager.instance.startListening(() {
-      setState(() {});
-    });
+    _showAllQuotes();
 
     _loginObserverKey = AuthManager.instance.addLoginObserver(() {
       setState(() {});
@@ -45,11 +44,36 @@ class _MovieQuotesListPageState extends State<MovieQuotesListPage> {
     });
   }
 
+  void _showAllQuotes() {
+    // MovieQuoteCollectionManager.instance.stopListening(movieQuotesSubscription);
+    // movieQuotesSubscription =
+    //     MovieQuoteCollectionManager.instance.startListening(() {
+    //   setState(() {});
+    // });
+    setState(() {
+      _isShowingAllQuotes = true;
+    });
+  }
+
+  void _showOnlyMyQuotes() {
+    // MovieQuoteCollectionManager.instance.stopListening(movieQuotesSubscription);
+    // movieQuotesSubscription =
+    //     MovieQuoteCollectionManager.instance.startListening(
+    //   () {
+    //     setState(() {});
+    //   },
+    //   isFilteredForMine: true,
+    // );
+    setState(() {
+      _isShowingAllQuotes = false;
+    });
+  }
+
   @override
   void dispose() {
     quoteTextController.dispose();
     movieTextController.dispose();
-    MovieQuoteCollectionManager.instance.stopListening(movieQuotesSubscription);
+    //MovieQuoteCollectionManager.instance.stopListening(movieQuotesSubscription);
     AuthManager.instance.removeObserver(_loginObserverKey);
     AuthManager.instance.removeObserver(_logoutObserverKey);
     super.dispose();
@@ -57,26 +81,26 @@ class _MovieQuotesListPageState extends State<MovieQuotesListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final List<MovieQuoteRow> movieRows =
-        MovieQuoteCollectionManager.instance.latestMovieQuotes
-            .map((mq) => MovieQuoteRow(
-                  movieQuote: mq,
-                  onTap: () async {
-                    print(
-                        "You clicked on the movie quote ${mq.quote} - ${mq.movie}");
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) {
-                          return MovieQuoteDetailPage(
-                              mq.documentId!); // In Firebase use a documentId
-                        },
-                      ),
-                    );
-                    setState(() {});
-                  },
-                ))
-            .toList();
+    // final List<MovieQuoteRow> movieRows =
+    //     MovieQuoteCollectionManager.instance.latestMovieQuotes
+    //         .map((mq) => MovieQuoteRow(
+    //               movieQuote: mq,
+    //               onTap: () async {
+    //                 print(
+    //                     "You clicked on the movie quote ${mq.quote} - ${mq.movie}");
+    //                 await Navigator.push(
+    //                   context,
+    //                   MaterialPageRoute(
+    //                     builder: (BuildContext context) {
+    //                       return MovieQuoteDetailPage(
+    //                           mq.documentId!); // In Firebase use a documentId
+    //                     },
+    //                   ),
+    //                 );
+    //                 setState(() {});
+    //               },
+    //             ))
+    //         .toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -98,10 +122,47 @@ class _MovieQuotesListPageState extends State<MovieQuotesListPage> {
               ],
       ),
       backgroundColor: Colors.grey[100],
-      body: ListView(
-        children: movieRows,
+      // body: ListView(
+      //   children: movieRows,
+      // ),
+      body: FirestoreListView<MovieQuote>(
+        query: _isShowingAllQuotes
+            ? MovieQuoteCollectionManager.instance.allMovieQuotesQuery
+            : MovieQuoteCollectionManager.instance.mineOnlyMovieQuotesQuery,
+        itemBuilder: (context, snapshot) {
+          // Data is now typed!
+          //User user = snapshot.data();
+          MovieQuote mq = snapshot.data();
+          return MovieQuoteRow(
+            movieQuote: mq,
+            onTap: () async {
+              print("You clicked on the movie quote ${mq.quote} - ${mq.movie}");
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) {
+                    return MovieQuoteDetailPage(
+                        mq.documentId!); // In Firebase use a documentId
+                  },
+                ),
+              );
+              setState(() {});
+            },
+          );
+        },
       ),
-      drawer: AuthManager.instance.isSignedIn ? ListPageSideDrawer() : null,
+      drawer: AuthManager.instance.isSignedIn
+          ? ListPageSideDrawer(
+              showAllCallback: () {
+                print("MovieQuoteListPage: Callback to show all quotes");
+                _showAllQuotes();
+              },
+              showOnlyMineCallback: () {
+                print("MovieQuoteListPage: Callback to show only my quotes");
+                _showOnlyMyQuotes();
+              },
+            )
+          : null,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           if (AuthManager.instance.isSignedIn) {

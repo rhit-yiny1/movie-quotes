@@ -25,8 +25,6 @@ class _EmailPasswordAuthPageState extends State<EmailPasswordAuthPage> {
   @override
   void initState() {
     _loginObserverKey = AuthManager.instance.addLoginObserver(() {
-      print("pop this page");
-
       Navigator.of(context).popUntil((route) => route.isFirst);
     });
     super.initState();
@@ -42,6 +40,9 @@ class _EmailPasswordAuthPageState extends State<EmailPasswordAuthPage> {
 
   @override
   Widget build(BuildContext context) {
+    emailTextController.text = "a9@b.co"; // TODO Remove: HACK FOR TESTING!
+    passwordTextController.text = "123456"; // TODO Remove: HACK FOR TESTING!
+
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.isNewUser
@@ -113,7 +114,7 @@ class _EmailPasswordAuthPageState extends State<EmailPasswordAuthPage> {
                           password: passwordTextController.text,
                         );
                       } else {
-                        print("Logging in an existing user");
+                        // print("TODO: Log in an existing user");
                         AuthManager.instance.logInExistingUserEmailPassword(
                           context: context,
                           email: emailTextController.text,

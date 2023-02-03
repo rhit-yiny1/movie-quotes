@@ -4,7 +4,13 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:movie_quotes/managers/auth_manager.dart';
 
 class ListPageSideDrawer extends StatelessWidget {
-  const ListPageSideDrawer({super.key});
+  final Function() showAllCallback;
+  final Function() showOnlyMineCallback;
+  const ListPageSideDrawer({
+    required this.showAllCallback,
+    required this.showOnlyMineCallback,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +34,7 @@ class ListPageSideDrawer extends StatelessWidget {
             title: const Text('Show only my quotes'),
             leading: Icon(Icons.person),
             onTap: () {
-              //Call the callback sayinng show only my quotes
+              showOnlyMineCallback();
               Navigator.of(context).pop();
             },
           ),
@@ -36,6 +42,7 @@ class ListPageSideDrawer extends StatelessWidget {
             title: const Text('Show all quotes'),
             leading: Icon(Icons.group),
             onTap: () {
+              showAllCallback();
               Navigator.of(context).pop();
             },
           ),

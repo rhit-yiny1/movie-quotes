@@ -1,8 +1,8 @@
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
-
-import 'email_password_auth_page.dart';
+import 'package:movie_quotes/pages/email_password_auth_page.dart';
 
 class LoginFrontPage extends StatefulWidget {
   const LoginFrontPage({super.key});
@@ -73,6 +73,23 @@ class _LoginFrontPageState extends State<LoginFrontPage> {
                 callback: () {
                   print(
                       "TODO: Log in using Firebase Auth and an OAuth provider (like Google)");
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) {
+                        return SignInScreen(
+                          // providers: [],
+                          actions: [
+                            AuthStateChangeAction((context, state) {
+                              Navigator.of(context)
+                                  .popUntil((route) => route.isFirst);
+                            }),
+                          ],
+                        );
+                      },
+                    ),
+                  );
                 })
           ],
         ),

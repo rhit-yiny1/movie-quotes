@@ -31,4 +31,13 @@ class MovieQuote {
           authorUid:
               FirestoreModelUtils.getStringField(doc, kMovieQuote_authorUid),
         );
+
+  Map<String, Object?> toMap() {
+    return {
+      kMovieQuote_quote: quote,
+      kMovieQuote_movie: movie,
+      kMovieQuote_authorUid: authorUid,
+      kMovieQuote_lastTouched: lastTouched,
+    };
+  }
 }
